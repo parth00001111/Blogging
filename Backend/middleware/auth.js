@@ -8,7 +8,7 @@ const middleware = (req, res, next) => {
     }
     try {
         const decoded = jwt.verify(token, SECRET_Key);
-        req.userDetail = decoded;
+        req.userDetail = decoded;//req.userDetail = username i.e "parth"
         next();
     } catch (e) {
         res.status(401).send("Invalid token");

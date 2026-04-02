@@ -1,48 +1,42 @@
-const { allPosts, postId } = require("../data/store");   
-
+const { postModel } = require("../models/models");
 //CREATE POST
-const createPost = (req, res) => {
-    const userDetail = req.userDetail;
+const createPost = async(req, res) => {
+    const userId = req.userDetail.id;
     const title = req.body.title;
-    const content = req.body.content;
-    postId.postId++;                     
-    allPosts.push({
-        postId: postId.postId,
-        userDetail,
-        title,
-        content,
-        comments:[]
-    })
-    
+    const content = req.body.content             
+   const newPost = await postModel.create({
+       
+            title,
+            content,
+            userId,
+            comment:[]
+        });
     res.json({
-        postId: postId.postId,
-        userDetail,
-        title,
-        content,
-        comments:[]
+       newPost
     })
 }
 
 //ADD COMMENT
-const addComment = (req, res) => {
-    const postIdNum = Number(req.params.postId);
-    const post = allPosts.find(p => p.postId === postIdNum);
-    if(!post){
-        res.status(411).send("Cannot Comment");
-        return;
-    }
-    const comment = req.body.comment;
-    const userDetail = req.userDetail
-    post.comments.push({
-        comment: comment,
-        userDetail:userDetail
-    })
-    
-    res.json({
-        comment
-    })
-}
+const addComment = async (req, res) => {
+    const postId = req.params.postId;
+    const commentText = req.body.comment;
+    const userId = req.userDetail.id;
 
+    const post = await postModel.findById(postId);
+
+    if (!post) {
+        return res.send("Post not found");
+    }
+
+    post.comment.push({
+        comment: commentText,
+        userId: userId
+    });
+
+    await post.save();
+
+    res.send("Comment added");
+};
 //GET ALL POSTS
 const getAllPosts = (req,res) => {
     res.json(allPosts)

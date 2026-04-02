@@ -1,42 +1,53 @@
-const { users } = require("../data/store");
+
 const jwt = require('jsonwebtoken');
 const { SECRET_Key } = require("../config");
-
+const { userModel} = require("../models/models")
 //SIGN UP
-const signup = (req, res) => {
+const signup = async(req, res) => {
     const username = req.body.username;
     const password = req.body.password;
-
-    const userExist = users.find(item => item.username === username);
-    if(userExist){
-        res.status(409).send("User Already Exist!");
-        return;
-    }
-    users.push({
-        username, 
-        password
+    const userExist = await userModel.findOne({
+        username: username
     })
-    res.send("You've Signed Up Successfully");
+  if(userExist){
+    res.status(403).josn({
+        message: "User with this name already exists"
+    })
+    return;
+  }
+  const newUser = await userModel.create({
+    username:username,
+    password:password
+  })
+
+   
+    res.json({
+        message:"you have signed up successfully",
+        id:newUser._id
+    })
 }
 
 // SIGN IN
-const signin = (req, res) => {
+const signin = async(req, res) => {
     const username = req.body.username;
     const password = req.body.password;
-
-    const userExist = users.find(user => user.username === username && user.password === password);
-
+    const userExist = userModel.findOne({
+        username:username,
+        password:password
+    })
     if(!userExist){
-        res.status(401).send("Unauthorized");
-        return
+        res.status(401).josn({
+            message:"You are not authorized"
+        })
     }
     const token = jwt.sign({
-        username
-    },SECRET_Key)
-
+        userId:userExist._id
+    }, SECRET_Key)
     res.json({
         token
     })
+
 }
+   
 
 module.exports = { signup, signin };
