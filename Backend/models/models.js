@@ -1,5 +1,6 @@
-    const mongoose = require("mongoose");
-    mongoose.connect("mongodb+srv://kanhamahajan73:kanha123@cluster0.lmz1a4r.mongodb.net/Blog")
+const mongoose = require("mongoose");
+
+
 
 const userSchema = new mongoose.Schema({
     username:String,

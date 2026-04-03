@@ -10,7 +10,7 @@ const signup = async(req, res) => {
         username: username
     })
   if(userExist){
-    res.status(403).josn({
+    res.status(403).json({
         message: "User with this name already exists"
     })
     return;
@@ -31,12 +31,12 @@ const signup = async(req, res) => {
 const signin = async(req, res) => {
     const username = req.body.username;
     const password = req.body.password;
-    const userExist = userModel.findOne({
+    const userExist = await userModel.findOne({
         username:username,
         password:password
     })
     if(!userExist){
-        res.status(401).josn({
+        res.status(401).json({
             message:"You are not authorized"
         })
     }
